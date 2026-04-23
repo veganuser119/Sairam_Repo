@@ -24,3 +24,13 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Use eclipse-temurin:17-jdk as the base image for build stage
+FROM eclipse-temurin:17-jdk AS build
+
+# ... your other Dockerfile instructions ...
+
+# Use eclipse-temurin:17-jre for the runtime stage
+FROM eclipse-temurin:17-jre
+
+# ... your other runtime instructions ...

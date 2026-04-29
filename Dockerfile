@@ -1,5 +1,5 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk AS build
+# Use eclipse-temurin:17-jdk for build stage (replaces deprecated openjdk:17-jdk)
+FROM eclipse-temurin:17-jdk AS build
 
 # Set the working directory
 WORKDIR /app
@@ -11,26 +11,22 @@ COPY build.gradle build.gradle
 COPY settings.gradle settings.gradle
 
 # Copy the source code
-COPY src/src /app/src
+COPY src src
 
 # Build the application
-RUN ./gradlew build -x test
+RUN chmod +x ./gradlew && ./gradlew build -x test
 
 # Second stage, to create a lighter image
-FROM openjdk:17-jre
+FROM eclipse-temurin:17-jre
+
+# Set working directory
+WORKDIR /app
 
 # Copy the jar file from the previous stage
 COPY --from=build /app/build/libs/*.jar app.jar
 
+# Expose port 8080
+EXPOSE 8080
+
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
-# Use eclipse-temurin:17-jdk as the base image for build stage
-FROM eclipse-temurin:17-jdk AS build
-
-# ... your other Dockerfile instructions ...
-
-# Use eclipse-temurin:17-jre for the runtime stage
-FROM eclipse-temurin:17-jre
-
-# ... your other runtime instructions ...
